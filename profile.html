@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Chess Engine – Profile</title>
+  <meta name="description" content="View and edit your Chess Engine player profile, stats and achievements."/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:radial-gradient(ellipse at 30% 20%,#3a1f08,#0d0804 60%,#000);
+      font-family:'Inter',sans-serif;color:#f0d9a0;display:flex;flex-direction:column;align-items:center;padding:30px 16px}
+    h1{font-family:'Cinzel',serif;font-size:1.5rem;color:#f0c870;letter-spacing:3px;text-shadow:0 0 20px rgba(212,168,74,.4)}
+    .back{position:fixed;top:16px;left:16px;background:rgba(80,40,10,.8);border:1px solid #7a4810;
+      color:#f0c870;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'Cinzel',serif;
+      font-size:.8rem;letter-spacing:1px;text-decoration:none;transition:.2s;z-index:10}
+    .back:hover{border-color:#d4a84a}
+    .card{background:linear-gradient(145deg,rgba(80,40,10,.9),rgba(20,8,2,.95));
+      border:1.5px solid #7a4810;border-radius:14px;padding:32px;width:100%;max-width:520px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);margin-top:20px}
+
+    /* ── Avatar ──────────────────────────────────────────────────────────── */
+    .avatar-section{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px;position:relative}
+    .avatar-wrap{position:relative;cursor:pointer}
+    .avatar-img{width:90px;height:90px;border-radius:50%;border:3px solid #d4a84a;
+      object-fit:cover;background:linear-gradient(135deg,#5a3010,#2a1005);
+      display:flex;align-items:center;justify-content:center;font-size:2.5rem;
+      transition:.2s;user-select:none}
+    .avatar-img:hover{border-color:#f0c870;box-shadow:0 0 20px rgba(212,168,74,.4)}
+    .avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);
+      display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;
+      font-size:.7rem;color:#fff;font-family:'Cinzel',serif;letter-spacing:.5px;text-align:center;line-height:1.3}
+    .avatar-wrap:hover .avatar-overlay{opacity:1}
+    .avatar-upload-input{display:none}
+
+    .uname{font-family:'Cinzel',serif;font-size:1.3rem;color:#f0c870;letter-spacing:2px}
+    .email{font-size:.8rem;color:#7a5830;margin-top:3px}
+    .joined{font-size:.75rem;color:#5a4020;margin-top:2px}
+
+    /* upload status */
+    .upload-msg{font-size:.78rem;min-height:18px;text-align:center;margin-top:4px}
+    .upload-msg.ok{color:#80e080}
+    .upload-msg.err{color:#ff7060}
+
+    /* change photo button */
+    .btn-avatar{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:1.5px;
+      background:linear-gradient(135deg,#5c3010,#3a1e08);border:1.5px solid #7a4810;
+      color:#f0c870;padding:6px 16px;border-radius:20px;cursor:pointer;transition:.2s;
+      display:inline-flex;align-items:center;gap:6px}
+    .btn-avatar:hover{border-color:#d4a84a;background:linear-gradient(135deg,#7a4010,#502808)}
+    .btn-avatar:disabled{opacity:.5;cursor:not-allowed}
+
+    /* ── Coins ────────────────────────────────────────────────────────────── */
+    .coins-badge{display:flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,#5a3800,#3a2000);
+      border:1.5px solid #c8900a;border-radius:30px;padding:8px 20px;
+      font-family:'Cinzel',serif;font-size:1.1rem;color:#f0c870;
+      box-shadow:0 0 15px rgba(200,145,10,.25);margin-bottom:24px}
+    .coin-icon{font-size:1.4rem}
+    .coin-label{font-size:.75rem;color:#a07040;letter-spacing:1px;display:block}
+
+    /* ── Stats grid ───────────────────────────────────────────────────────── */
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:24px}
+    .stat{background:rgba(255,255,255,.04);border:1px solid #4a2a08;border-radius:8px;
+      padding:14px 8px;text-align:center}
+    .stat-val{font-family:'Cinzel',serif;font-size:1.5rem;color:#f0c870}
+    .stat-lbl{font-size:.7rem;color:#7a5830;letter-spacing:1px;margin-top:3px;text-transform:uppercase}
+    .stat.wins .stat-val{color:#80e080}
+    .stat.losses .stat-val{color:#ff7060}
+    .stat.draws .stat-val{color:#80c0ff}
+
+    .winrate-bar{background:rgba(255,255,255,.06);border-radius:20px;height:8px;overflow:hidden;margin-bottom:6px}
+    .winrate-fill{height:100%;background:linear-gradient(90deg,#c8900a,#e0c040);border-radius:20px;transition:width .8s ease}
+    .winrate-txt{font-size:.78rem;color:#a07840;text-align:right}
+
+    .section-title{font-family:'Cinzel',serif;font-size:.8rem;color:#7a5030;letter-spacing:2px;
+      text-transform:uppercase;margin:20px 0 10px;border-bottom:1px solid #3a1a08;padding-bottom:6px}
+
+    /* ── Achievements ─────────────────────────────────────────────────────── */
+    .achievement{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);
+      border:1px solid #4a2a08;border-radius:8px;padding:10px 14px;margin-bottom:8px;transition:.2s}
+    .achievement.unlocked{border-color:#6a4010;background:rgba(100,60,10,.12)}
+    .ach-icon{font-size:1.5rem;width:36px;text-align:center}
+    .ach-name{font-size:.88rem;color:#d4a84a;font-weight:600}
+    .ach-desc{font-size:.75rem;color:#6a4820}
+    .ach-locked{opacity:.35;filter:grayscale(1)}
+
+    /* ── Action buttons ───────────────────────────────────────────────────── */
+    .btn-logout{width:100%;padding:11px;border:1.5px solid #7a4810;border-radius:7px;cursor:pointer;
+      font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:2px;background:transparent;
+      color:#c07030;transition:.2s;margin-top:4px}
+    .btn-logout:hover{border-color:#d4a84a;color:#f0c870;background:rgba(80,40,10,.4)}
+    .btn-play{width:100%;padding:12px;border:none;border-radius:7px;cursor:pointer;
+      font-family:'Cinzel',serif;font-size:1rem;letter-spacing:2px;
+      background:linear-gradient(135deg,#c8920a,#8b5e10);color:#fff8e0;
+      box-shadow:0 4px 15px rgba(200,145,10,.3);transition:.2s;margin-bottom:10px}
+    .btn-play:hover{background:linear-gradient(135deg,#e0a820,#a07020);transform:translateY(-1px)}
+
+    /* ── XP bar ───────────────────────────────────────────────────────────── */
+    .xp-row{margin-bottom:22px}
+    .xp-label{font-family:'Cinzel',serif;font-size:.72rem;color:#8a6030;letter-spacing:1px;margin-bottom:5px;display:flex;justify-content:space-between}
+    .xp-track{background:rgba(255,255,255,.07);border-radius:20px;height:8px;overflow:hidden}
+    .xp-bar-fill{height:100%;background:linear-gradient(90deg,#c8900a,#f0c870);border-radius:20px;transition:width .8s ease;width:0%}
+
+    /* spinner */
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);
+      border-top-color:#f0c870;border-radius:50%;animation:_spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes _spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<a class="back" href="index.html">◀ BACK TO GAME</a>
+
+<div style="margin-bottom:10px;margin-top:10px"><h1>♔ PLAYER PROFILE</h1></div>
+
+<div class="card" id="profileCard">
+  <div style="text-align:center;color:#7a5830;padding:30px">Loading profile...</div>
+</div>
+
+<script>
+const API = 'http://localhost:4000/api/auth';
+
+// ── Auth guard ────────────────────────────────────────────────────────────────
+(function() {
+  const token = localStorage.getItem('chess_token');
+  const user  = localStorage.getItem('chess_user');
+  if (!token || !user) window.location.replace('auth.html');
+})();
+
+// ── Load & render ──────────────────────────────────────────────────────────────
+async function loadProfile() {
+  const token  = localStorage.getItem('chess_token');
+  const cached = localStorage.getItem('chess_user');
+  if (!cached) { window.location.href = 'auth.html'; return; }
+
+  let user = JSON.parse(cached);
+  if (token) {
+    try {
+      const res = await fetch(API + '/me', { headers: { Authorization: 'Bearer ' + token } });
+      if (res.ok) { user = await res.json(); localStorage.setItem('chess_user', JSON.stringify(user)); }
+    } catch(e) { /* offline – use cached */ }
+  }
+  renderProfile(user);
+}
+
+function renderProfile(u) {
+  const wr     = u.gamesPlayed > 0 ? Math.round((u.wins / u.gamesPlayed) * 100) : 0;
+  const joined = new Date(u.createdAt).toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
+  const xpNeeded = u.xpForNextLevel || (u.level * 150);
+  const xpPct    = Math.min(100, Math.round((u.xp / xpNeeded) * 100));
+
+  const avatarHtml = u.avatar
+    ? `<img src="${u.avatar}" alt="avatar" class="avatar-img" id="avatar-display" style="width:90px;height:90px;border-radius:50%;border:3px solid #d4a84a;object-fit:cover">`
+    : `<div class="avatar-img" id="avatar-display" style="display:flex;align-items:center;justify-content:center;font-size:2.8rem">♟</div>`;
+
+  const achievements = [
+    { icon:'🏆', name:'First Blood',  desc:'Win your first game',        unlocked: u.wins >= 1 },
+    { icon:'👑', name:'Chess King',   desc:'Win 10 games',                unlocked: u.wins >= 10 },
+    { icon:'💰', name:'Coin Hoarder', desc:'Collect 100 coins',          unlocked: u.coins >= 100 },
+    { icon:'⚡', name:'Blitz Master', desc:'Play 20 games',              unlocked: u.gamesPlayed >= 20 },
+    { icon:'🎯', name:'Sharpshooter', desc:'Win rate above 60%',         unlocked: wr >= 60 },
+    { icon:'♟️', name:'Grandmaster',  desc:'Win 50 games',               unlocked: u.wins >= 50 },
+    { icon:'🔥', name:'On Fire',      desc:'Win 5 games in a row',       unlocked: u.bestStreak >= 5 },
+    { icon:'⚔️', name:'Veteran',      desc:'Play 50 games',              unlocked: u.gamesPlayed >= 50 },
+  ];
+
+  document.getElementById('profileCard').innerHTML = `
+    <!-- ── Avatar section ── -->
+    <div class="avatar-section">
+      <div class="avatar-wrap" onclick="document.getElementById('avatar-file').click()" title="Change profile photo">
+        <div id="avatar-display" style="width:90px;height:90px;border-radius:50%;border:3px solid #d4a84a;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5a3010,#2a1005);font-size:2.8rem;transition:.2s">
+          ${u.avatar ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar">` : '♟'}
+        </div>
+        <div class="avatar-overlay">📷<br>Change<br>Photo</div>
+      </div>
+      <input type="file" id="avatar-file" class="avatar-upload-input" accept="image/jpeg,image/png,image/webp,image/gif">
+      <button class="btn-avatar" id="avatar-btn" onclick="document.getElementById('avatar-file').click()">📷 Change Profile Photo</button>
+      <div class="upload-msg" id="upload-msg"></div>
+
+      <div style="text-align:center">
+        <div class="uname">${u.username}</div>
+        <div class="email">${u.email}</div>
+        <div class="joined">Joined ${joined}</div>
+      </div>
+    </div>
+
+    <!-- ── Level + XP ── -->
+    <div class="xp-row">
+      <div class="xp-label">
+        <span style="font-family:'Cinzel',serif;color:#f0c870">Level ${u.level}</span>
+        <span>${u.xp} / ${xpNeeded} XP</span>
+      </div>
+      <div class="xp-track"><div class="xp-bar-fill" style="width:${xpPct}%"></div></div>
+    </div>
+
+    <!-- ── Coins ── -->
+    <div class="coins-badge">
+      <span class="coin-icon">🪙</span>
+      <div>
+        <span style="font-size:1.3rem">${u.coins}</span>
+        <span class="coin-label">COINS EARNED</span>
+      </div>
+    </div>
+
+    <!-- ── Stats ── -->
+    <div class="stats-grid">
+      <div class="stat wins">  <div class="stat-val">${u.wins}</div>        <div class="stat-lbl">Wins</div></div>
+      <div class="stat losses"><div class="stat-val">${u.losses}</div>      <div class="stat-lbl">Losses</div></div>
+      <div class="stat draws"> <div class="stat-val">${u.draws}</div>       <div class="stat-lbl">Draws</div></div>
+      <div class="stat">       <div class="stat-val">${u.gamesPlayed}</div> <div class="stat-lbl">Games</div></div>
+    </div>
+    <div style="margin-bottom:20px">
+      <div class="winrate-bar"><div class="winrate-fill" style="width:${wr}%"></div></div>
+      <div class="winrate-txt">Win Rate: ${wr}% &nbsp;|&nbsp; Best Streak: 🔥${u.bestStreak}</div>
+    </div>
+
+    <!-- ── Achievements ── -->
+    <div class="section-title">Achievements</div>
+    ${achievements.map(a => `
+      <div class="achievement${a.unlocked ? ' unlocked' : ' ach-locked'}">
+        <div class="ach-icon">${a.icon}</div>
+        <div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+        ${a.unlocked ? '<span style="margin-left:auto;color:#80e080;font-size:.82rem;white-space:nowrap">✔ Unlocked</span>' : ''}
+      </div>`).join('')}
+
+    <!-- ── Actions ── -->
+    <div style="margin-top:24px">
+      <button class="btn-play" onclick="window.location.href='index.html'">▶ PLAY GAME</button>
+      <button class="btn-logout" onclick="logout()">SIGN OUT</button>
+    </div>
+  `;
+
+  // Wire up avatar file input
+  document.getElementById('avatar-file').addEventListener('change', handleAvatarUpload);
+}
+
+// ── Avatar Upload ─────────────────────────────────────────────────────────────
+async function handleAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validate size before reading (max 1.5 MB)
+  if (file.size > 1.5 * 1024 * 1024) {
+    setUploadMsg('Image too large — max 1.5 MB', 'err');
+    return;
+  }
+
+  setUploadMsg('<span class="spin"></span>Uploading…', '');
+
+  const token = localStorage.getItem('chess_token');
+  if (!token) { setUploadMsg('Please log in again', 'err'); return; }
+
+  try {
+    // Convert to base64
+    const base64 = await fileToBase64(file);
+
+    const res  = await fetch(API + '/avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ avatar: base64 })
+    });
+    const data = await res.json();
+    if (!res.ok) { setUploadMsg(data.error || 'Upload failed', 'err'); return; }
+
+    // Update cached user
+    const user = JSON.parse(localStorage.getItem('chess_user') || '{}');
+    user.avatar = data.avatar;
+    localStorage.setItem('chess_user', JSON.stringify(user));
+
+    // Update avatar display
+    const display = document.getElementById('avatar-display');
+    if (display) {
+      display.innerHTML = `<img src="${data.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar">`;
+    }
+    setUploadMsg('✅ Photo updated!', 'ok');
+    setTimeout(() => setUploadMsg('', ''), 3000);
+  } catch(err) {
+    setUploadMsg('Upload failed – check connection', 'err');
+  }
+  // Reset input so same file can be re-selected
+  e.target.value = '';
+}
+
+function setUploadMsg(html, cls) {
+  const el = document.getElementById('upload-msg');
+  if (!el) return;
+  el.innerHTML = html;
+  el.className = 'upload-msg ' + cls;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function logout() {
+  localStorage.removeItem('chess_token');
+  localStorage.removeItem('chess_user');
+  window.location.href = 'auth.html';
+}
+
+loadProfile();
+</script>
+</body>
+</html>

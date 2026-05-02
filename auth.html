@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Engine – Sign In</title>
+  <meta name="description" content="Login or register to play Chess Engine and earn coins." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <script>
+    // Already logged in? Go straight to game
+    (function () {
+      if (localStorage.getItem('chess_token') && localStorage.getItem('chess_user')) {
+        window.location.replace('index.html');
+      }
+    })();
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 30% 20%, #3a1f08 0%, #0d0804 60%, #000 100%);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* floating chess pieces bg */
+    .bg-pieces {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0
+    }
+
+    .bg-piece {
+      position: absolute;
+      font-size: 4rem;
+      opacity: .06;
+      animation: floatPiece 18s infinite linear
+    }
+
+    @keyframes floatPiece {
+      0% {
+        transform: translateY(110vh) rotate(0deg)
+      }
+
+      100% {
+        transform: translateY(-10vh) rotate(360deg)
+      }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(145deg, rgba(80, 40, 10, .95), rgba(20, 8, 2, .97));
+      border: 1.5px solid #7a4810;
+      border-radius: 14px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 0 1px #3a1a08, 0 20px 60px rgba(0, 0, 0, .8);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 28px
+    }
+
+    .logo h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: #f0c870;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(212, 168, 74, .5)
+    }
+
+    .logo p {
+      color: #a07840;
+      font-size: .85rem;
+      margin-top: 4px;
+      letter-spacing: 1px
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 28px;
+      border-bottom: 1.5px solid #4a2a08
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: .85rem;
+      color: #8a6030;
+      letter-spacing: 1.5px;
+      transition: .2s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1.5px
+    }
+
+    .tab.active {
+      color: #f0c870;
+      border-bottom-color: #d4a84a
+    }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      color: #a07840;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      margin-top: 14px;
+      text-transform: uppercase
+    }
+
+    input {
+      width: 100%;
+      background: rgba(255, 255, 255, .05);
+      border: 1.5px solid #4a2a08;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #f0d9a0;
+      font-size: .9rem;
+      outline: none;
+      transition: .2s;
+    }
+
+    input:focus {
+      border-color: #d4a84a;
+      box-shadow: 0 0 0 3px rgba(212, 168, 74, .15)
+    }
+
+    input::placeholder {
+      color: #6a4820
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 22px;
+      padding: 12px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #c8920a, #8b5e10);
+      color: #fff8e0;
+      box-shadow: 0 4px 15px rgba(200, 145, 10, .3);
+      transition: .2s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #e0a820, #a07020);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(200, 145, 10, .4)
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: .85rem;
+      min-height: 20px;
+      padding: 6px;
+      border-radius: 5px
+    }
+
+    .msg.error {
+      color: #ff7060;
+      background: rgba(255, 100, 80, .1)
+    }
+
+    .msg.success {
+      color: #80e080;
+      background: rgba(80, 200, 80, .1)
+    }
+
+    .guest-link {
+      text-align: center;
+      margin-top: 18px
+    }
+
+    .guest-link a {
+      color: #7a5030;
+      font-size: .82rem;
+      text-decoration: none;
+      letter-spacing: .5px;
+      transition: .2s
+    }
+
+    .guest-link a:hover {
+      color: #d4a84a
+    }
+
+    .form-panel {
+      display: none
+    }
+
+    .form-panel.active {
+      display: block
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- floating pieces background -->
+  <div class="bg-pieces">
+    <span class="bg-piece" style="left:5%;animation-delay:0s;animation-duration:20s">♔</span>
+    <span class="bg-piece" style="left:18%;animation-delay:3s;animation-duration:15s">♛</span>
+    <span class="bg-piece" style="left:35%;animation-delay:7s;animation-duration:22s">♞</span>
+    <span class="bg-piece" style="left:55%;animation-delay:1s;animation-duration:17s">♝</span>
+    <span class="bg-piece" style="left:72%;animation-delay:5s;animation-duration:19s">♜</span>
+    <span class="bg-piece" style="left:88%;animation-delay:9s;animation-duration:14s">♟</span>
+  </div>
+
+  <div class="card">
+    <div class="logo">
+      <h1>♔ CHESS ENGINE</h1>
+      <p>PLAY · EARN · COMPETE</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">SIGN IN</div>
+      <div class="tab" id="tab-register" onclick="switchTab('register')">REGISTER</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel active" id="panel-login">
+      <label for="login-user">Username or Email</label>
+      <input id="login-user" type="text" placeholder="Enter username or email" autocomplete="username" />
+      <label for="login-pass">Password</label>
+      <input id="login-pass" type="password" placeholder="Enter password" autocomplete="current-password" />
+      <button class="btn" id="btn-login" onclick="doLogin()">SIGN IN</button>
+      <div class="msg" id="msg-login"></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="form-panel" id="panel-register">
+      <label for="reg-user">Username</label>
+      <input id="reg-user" type="text" placeholder="Choose a username" autocomplete="username" />
+      <label for="reg-email">Email</label>
+      <input id="reg-email" type="email" placeholder="your@email.com" autocomplete="email" />
+      <label for="reg-pass">Password</label>
+      <input id="reg-pass" type="password" placeholder="Min 6 characters" autocomplete="new-password" />
+      <button class="btn" id="btn-register" onclick="doRegister()">CREATE ACCOUNT</button>
+      <div class="msg" id="msg-register"></div>
+    </div>
+
+    <div class="guest-link">
+      <a href="index.html">▶ Play as Guest (no stats saved)</a>
+    </div>
+  </div>
+
+
+  <script>
+    const API = 'http://localhost:4000/api/auth';
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    function setMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = 'msg ' + type;
+    }
+
+    function setBtnLoading(id, loading) {
+      const btn = document.getElementById(id);
+      btn.disabled = loading;
+      btn.innerHTML = loading ? '<span class="spinner"></span>LOADING...' : btn.dataset.label;
+    }
+
+    document.getElementById('btn-login').dataset.label = 'SIGN IN';
+    document.getElementById('btn-register').dataset.label = 'CREATE ACCOUNT';
+
+    async function doLogin() {
+      const username = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value;
+      if (!username || !password) return setMsg('msg-login', 'Fill all fields', 'error');
+      setBtnLoading('btn-login', true);
+      try {
+        const res = await fetch(API + '/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        localStorage.setItem('chess_token', data.token);
+        localStorage.setItem('chess_user', JSON.stringify(data.user));
+        setMsg('msg-login', '✅ Welcome back, ' + data.user.username + '!', 'success');
+        setTimeout(() => window.location.href = 'index.html', 900);
+      } catch (e) {
+        setMsg('msg-login', e.message, 'error');
+        setBtnLoading('btn-login', false);
+      }
+    }
+
+    async function doRegister() {
+      const username = document.getElementById('reg-user').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-pass').value;
+      if (!username || !email || !password) return setMsg('msg-register', 'Fill all fields', 'error');
+      if (password.length < 6) return setMsg('msg-register', 'Password min 6 chars', 'error');
+      setBtnLoading('btn-register', true);
+      try {
+        const res = await fetch(API + '/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        localStorage.setItem('chess_token', data.token);
+        localStorage.setItem('chess_user', JSON.stringify(data.user));
+        setMsg('msg-register', '🎉 Account created! Welcome, ' + data.user.username, 'success');
+        setTimeout(() => window.location.href = 'index.html', 900);
+      } catch (e) {
+        setMsg('msg-register', e.message, 'error');
+        setBtnLoading('btn-register', false);
+      }
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const loginActive = document.getElementById('panel-login').classList.contains('active');
+        loginActive ? doLogin() : doRegister();
+      }
+    });
+  </script>
+</body>
+
+</html>
